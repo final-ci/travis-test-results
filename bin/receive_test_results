@@ -1,0 +1,11 @@
+#! /usr/bin/env ruby
+
+$: << 'lib'
+
+require 'bundler/setup'
+require 'travis/test-results'
+require 'travis/test-results/receive'
+
+app = Travis::TestResults::Receive.new
+app.setup
+app.run
