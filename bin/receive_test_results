@@ -8,4 +8,5 @@ require 'travis/test-results/receive'
 
 app = Travis::TestResults::Receive.new
 app.setup
+Travis.logger.info "Starting travis-test-results"
 app.run

@@ -7,6 +7,11 @@ database_defaults: &database_defaults
   port: 5432
 
 development:
+  test_results:
+    gc_pooling_interval: 15
+    threads: 3
+    pretty_json: true
+    results_path: '/var/lib/final-ci/test-results'
   test_results_database:
     <<: *database_defaults
     database: travis_development

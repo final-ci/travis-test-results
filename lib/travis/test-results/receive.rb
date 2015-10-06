@@ -1,4 +1,5 @@
-require 'travis/logs'
+#$: << 'lib'
+#require 'travis/logs'
 require 'travis/support'
 require 'travis/support/amqp'
 require 'travis/support/exceptions/reporter'
@@ -18,14 +19,14 @@ module Travis
         Travis::Exceptions::Reporter.start
         Travis::Metrics.setup
 
-        ActiveRecord::Base.default_timezone = :utc
-        ActiveRecord::Base.logger = Travis.logger
+        #ActiveRecord::Base.default_timezone = :utc
+        #ActiveRecord::Base.logger = Travis.logger
 
-        ActiveRecord::Base.configurations = {
-          'test_results_database' => Travis.config.test_results_database
-        }
+        #ActiveRecord::Base.configurations = {
+        #  'test_results_database' => Travis.config.test_results_database
+        #}
 
-        ActiveRecord::Base.establish_connection('test_results_database')
+        #ActiveRecord::Base.establish_connection('test_results_database')
 
 
         declare_exchanges
@@ -33,6 +34,7 @@ module Travis
 
       def run
         1.upto(TestResults.config.test_results.threads) do
+          puts "inicializuji thread..."
           Queue.subscribe('test_results', Travis::TestResults::Services::ProcessTestResults)
         end
       end

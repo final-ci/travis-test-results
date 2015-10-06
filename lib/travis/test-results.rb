@@ -1,4 +1,5 @@
 require 'travis/test-results/config'
+require 'travis/test-results/cache'
 
 module Travis
   def self.config
@@ -6,16 +7,26 @@ module Travis
   end
 
   module TestResults
-    def self.config
-      @config ||= Config.load
-    end
+    class << self
+      def config
+        @config ||= Config.load
+      end
 
-    def self.database_connection=(connection)
-      @database_connection = connection
-    end
+      def cache
+        #FIXME: make gc interval configurable
+        @cache ||= Travis::TestResults::Cache.new(
+          24.hours,
+          config.test_results.gc_pooling_interval
+        )
+      end
 
-    def self.database_connection
-      @database_connection
+      def database_connection=(connection)
+        @database_connection = connection
+      end
+
+      def database_connection
+        @database_connection
+      end
     end
   end
 end

@@ -11,8 +11,12 @@
 #    http://dba.stackexchange.com/a/46477/64412
 #    ... a lot of questions about best implementation...
 #    I have to study Postgress a bit...
+#
+#  * needs `finish` message?
+#  * needs numbered messages and and filter yunger ones
+#
 
-require 'travis/model'
+#require 'travis/model'
 
 module Travis
   module TestResults
@@ -38,18 +42,37 @@ module Travis
           attr_reader :database, :pusher_client, :existence
 
           def save_payload
-            Travis.logger.info "[info] storing payload: #{payload.inspect}"
-            TestStepResult.write_result(
-              job_id: payload['id'],
-              name: payload['name'],
-              classname: payload['classname'],
-              result: payload['result'],
-              duration: payload['duration'],
-              test_data: payload[:test_data]
-            )
-          rescue => e
-            Travis.logger.warn "[warn] could not save test_result job_id: #{payload['id']}: #{e.message}"
-            Travis.logger.warn e.backtrace
+            Travis.logger.debug "Processing payload: #{payload.inspect}"
+            Travis.uuid = payload['uuid']
+            if payload['final']
+              job_id = payload['job_id']
+              Travis::TestResults.cache.save_data_json(job_id, true)
+              Travis::TestResults.cache.delete(job_id)
+              return
+            end
+
+            payload['steps'].each do |step|
+              begin
+                Travis.logger.debug("Storing in cache: #{step}")
+
+                job_id = step['job_id']
+                uuid = step['uuid']
+                number = step['number']
+
+                cached = Travis::TestResults.cache.get(job_id, uuid)
+
+                # skip step update if is not fresh (e.g. we already recieved newer update)
+                if cached and cached['number'].to_i > number.to_i
+                  Travis.logger.info "Ignoring old message number=#{number}, already stored number=#{cached['number']}"
+                  next
+                end
+
+                Travis::TestResults.cache.set(job_id, uuid, step)
+              rescue => e
+                Travis.logger.warn "[warn] could not save test_result job_id: #{step['job_id']}: #{e.message}"
+                Travis.logger.warn e.backtrace
+              end
+            end
           end
 
       end

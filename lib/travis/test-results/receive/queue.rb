@@ -1,4 +1,3 @@
-require 'coder'
 require 'json'
 require 'timeout'
 
@@ -54,7 +53,7 @@ module Travis
             retry_count = 0
             begin
               Timeout::timeout(3, &block)
-            rescue Timeout::Error, Sequel::PoolTimeout => e
+            rescue Timeout::Error => e
               if retry_count < 2
                 retry_count += 1
                 Travis.logger.error "[queue] Processing of AMQP message exceeded 3 seconds, retrying #{retry_count} of 2"
@@ -70,7 +69,6 @@ module Travis
 
           def decode(payload)
             return payload if payload.is_a?(Hash)
-            payload = Coder.clean(payload)
             ::JSON.parse(payload)
           rescue StandardError => e
             error "[queue:decode] payload could not be decoded: #{e.inspect} #{payload.inspect}"
