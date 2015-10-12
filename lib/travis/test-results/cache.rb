@@ -16,7 +16,7 @@ module Travis::TestResults
 
     def initialize_garbage_collector(pooling_interval)
       @thread = Thread.new do
-        last_time_gc = 10.minutes.ago
+        last_time_gc = Time.now
         begin
           loop do
             Travis.logger.debug "Next step cache GC in #{pooling_interval} seconds."
