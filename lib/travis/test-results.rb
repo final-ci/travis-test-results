@@ -13,9 +13,8 @@ module Travis
       end
 
       def cache
-        #FIXME: make gc interval configurable
         @cache ||= Travis::TestResults::Cache.new(
-          24.hours,
+          config.test_results.gc_remove_after,
           config.test_results.gc_pooling_interval
         )
       end

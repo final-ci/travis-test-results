@@ -34,9 +34,9 @@ module Travis
 
       def run
         1.upto(TestResults.config.test_results.threads) do
-          puts "inicializuji thread..."
           Queue.subscribe('test_results', Travis::TestResults::Services::ProcessTestResults)
         end
+        sleep
       end
 
       def amqp_config
