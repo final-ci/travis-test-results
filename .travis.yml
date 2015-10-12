@@ -8,18 +8,15 @@ env:
   - JRUBY_OPTS="--dev -Xcext.enabled=false -Xcompile.invokedynamic=false"
 
 rvm:
-  - jruby-1.7.16
-  - jruby-head
-
-jdk: openjdk7
+  - ruby-2.2.2
 
 sudo: false
 cache: bundler
 
 before_script:
-  - psql -c "CREATE DATABASE test_results_test;" -U postgres
   - cp config/travis.example.yml config/travis.yml
-  - bundle exec rake db:migrate
+  - # psql -c "CREATE DATABASE test_results_test;" -U postgres
+  - # bundle exec rake db:migrate
 
 script: bundle exec rspec spec
 

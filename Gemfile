@@ -30,3 +30,8 @@ gem 'multi_json'
 group :test do
   gem 'rspec',            '~> 2.14.1'
 end
+
+
+group :test, :development do
+  gem 'rake'
+end
