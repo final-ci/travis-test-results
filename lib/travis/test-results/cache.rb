@@ -16,7 +16,7 @@ module Travis::TestResults
 
     def initialize_garbage_collector(pooling_interval)
       @thread = Thread.new do
-        last_time_gc = Time.now
+        last_time_gc = current_time_gc = Time.now
         begin
           loop do
             Travis.logger.debug "Next step cache GC in #{pooling_interval} seconds."
@@ -24,7 +24,8 @@ module Travis::TestResults
 
             start_time = Time.now
             gc(last_time_gc)
-            last_time_gc = start_time
+            last_time_gc = current_time_gc
+            current_time_gc = start_time
           end
         rescue StandardError => e
           Travis.logger.error "Step Cache GC exploded: #{e.class}: #{e.message}"
