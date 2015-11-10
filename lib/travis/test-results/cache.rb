@@ -29,7 +29,8 @@ module Travis::TestResults
           end
         rescue StandardError => e
           Travis.logger.error "Step Cache GC exploded: #{e.class}: #{e.message}"
-          raise e
+          Travis.logger.error "GC backtrace: #{e.backtrace.join("\n")}"
+          #raise e
         end
       end
     end
