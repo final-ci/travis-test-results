@@ -8,24 +8,27 @@ gem 'travis-config',      '~> 0.1.0'
 # .lib/travis/test-results/services/process_test_results.rb
 #gem 'travis-core',        github: 'finalci/travis-core' #, branch: 'feature/test_results_models'
 
+
+gem 'sequel',             '~> 4.28.0'
+gem 'pusher'
 gem 'metriks'
+gem 'sentry-raven',       github: 'getsentry/raven-ruby'
 
-platform :jruby do
+gem 'connection_pool'
 
-  gem 'march_hare',         '~> 2.3.0'
+gem 'sidekiq'
 
-  gem 'jdbc-postgres',      '9.3.1101'
-  gem 'activerecord-jdbcpostgresql-adapter'
-  gem 'activerecord-jdbc-adapter'
-end
-
-platform :mri do
-  gem 'bunny',            '~> 1.7.0'
-  gem 'pg'
-end
+gem 'bunny',              '~> 1.7.0'
+gem 'pg'
 
 #gem 'json',               '~> 1.8.0'
 gem 'multi_json'
+
+
+gem 'sinatra', '~> 1.4'
+gem 'connection_pool'
+gem 'rack-ssl'
+gem 'unicorn'
 
 group :test do
   gem 'rspec',            '~> 2.14.1'
@@ -34,4 +37,5 @@ end
 
 group :test, :development do
   gem 'rake'
+  gem 'rack-test'
 end

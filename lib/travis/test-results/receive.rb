@@ -1,11 +1,12 @@
 #$: << 'lib'
-#require 'travis/logs'
+require 'travis/test-results'
 require 'travis/support'
 require 'travis/support/amqp'
 require 'travis/support/exceptions/reporter'
 require 'travis/support/metrics'
 require 'travis/test-results/receive/queue'
 require 'travis/test-results/services/process_test_results'
+require 'travis/test-results/helpers/database'
 require 'active_support/core_ext/logger'
 
 $stdout.sync = true
@@ -19,14 +20,8 @@ module Travis
         Travis::Exceptions::Reporter.start
         Travis::Metrics.setup
 
-        #ActiveRecord::Base.default_timezone = :utc
-        #ActiveRecord::Base.logger = Travis.logger
-
-        #ActiveRecord::Base.configurations = {
-        #  'test_results_database' => Travis.config.test_results_database
-        #}
-
-        #ActiveRecord::Base.establish_connection('test_results_database')
+        db = Travis::TestResults::Helpers::Database.connect
+        TestResults.database_connection = db
 
 
         declare_exchanges

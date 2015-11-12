@@ -1,5 +1,4 @@
 require 'travis/test-results/config'
-require 'travis/test-results/cache'
 
 module Travis
   def self.config
@@ -10,13 +9,6 @@ module Travis
     class << self
       def config
         @config ||= Config.load
-      end
-
-      def cache
-        @cache ||= Travis::TestResults::Cache.new(
-          config.test_results.gc_remove_after,
-          config.test_results.gc_pooling_interval
-        )
       end
 
       def database_connection=(connection)

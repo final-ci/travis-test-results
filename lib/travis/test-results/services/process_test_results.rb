@@ -1,27 +1,24 @@
-#TODO:
-#
-#  this is skeleton of processing text results
-#  currently it is using travis-core models to persist paylod to DB
-#  It is wrong approach and has to be rewritten:
-#  * separace DB sould be used
-#  * without using a travis-core
-#  * use Pusher
-#  * storing to DB sould be done by PL/pgSQL and possibly store in bulk, see:
-#    Common Table Expressions,
-#    http://dba.stackexchange.com/a/46477/64412
-#    ... a lot of questions about best implementation...
-#    I have to study Postgress a bit...
-#
-#  * needs `finish` message?
-#  * needs numbered messages and and filter yunger ones
-#
+require 'travis/test-results/helpers/metrics'
+require "travis/test-results/helpers/pusher"
+require 'travis/test-results/existence'
+require 'pusher'
 
-#require 'travis/model'
+# pusher requires this in a method, which sometimes
+# causes and uninitialized constant error
+require 'net/https'
 
 module Travis
   module TestResults
     module Services
       class ProcessTestResults
+        include Helpers::Metrics
+
+        METRIKS_PREFIX = "test_results.process_results"
+
+        def self.metriks_prefix
+          METRIKS_PREFIX
+        end
+
 
         def self.run(payload)
           new(payload).run
@@ -31,48 +28,92 @@ module Travis
 
         def initialize(payload, database = nil, pusher_client = nil, existence = nil)
           @payload = payload
+          @database = database || Travis::TestResults.database_connection
+          @pusher_client = pusher_client || Travis::TestResults::Helpers::Pusher.new
+          @existence = existence || Travis::TestResults::Existence.new
         end
 
         def run
-          save_payload
+          measure do
+            create_step_results
+            notify
+          end
         end
 
         private
 
           attr_reader :database, :pusher_client, :existence
 
-          def save_payload
+          def create_step_results
             Travis.logger.debug "Processing payload: #{payload.inspect}"
             Travis.uuid = payload['uuid']
             if payload['final']
               job_id = payload['job_id']
-              Travis::TestResults.cache.save_data_json(job_id, true)
-              Travis::TestResults.cache.delete(job_id)
+              #TODO Schedule ArrgregareTestResults
               return
             end
 
             payload['steps'].each do |step|
               begin
-                Travis.logger.debug("Storing in cache: #{step}")
-
-                job_id = step['job_id']
-                uuid = step['uuid']
-                number = step['number']
-
-                cached = Travis::TestResults.cache.get(job_id, uuid)
-
-                # skip step update if is not fresh (e.g. we already recieved newer update)
-                if cached and cached['number'].to_i > number.to_i
-                  Travis.logger.info "Ignoring old message number=#{number}, already stored number=#{cached['number']}"
-                  next
-                end
-
-                Travis::TestResults.cache.set(job_id, uuid, step)
+                create_step(step)
               rescue => e
                 Travis.logger.warn "[warn] could not save test_result job_id: #{step['job_id']}: #{e.message}"
                 Travis.logger.warn e.backtrace
               end
             end
+          end
+
+          def create_step(step)
+            job_id = step['job_id']
+            Travis.logger.debug("Creating step: #{step} for job_id: #{job_id}")
+            database.create_step_result(job_id, step)
+          rescue Sequel::Error => e
+            Travis.logger.warn "[warn] could not save test-step for job_id: #{step.inspect}: #{e.message}"
+            Travis.logger.warn e.backtrace
+          end
+
+          def notify
+            if existence_check_metrics? || existence_check?
+              if channel_occupied?(channel_name)
+                mark("pusher.send")
+              else
+                mark("pusher.ignore")
+
+                if existence_check?
+                  return
+                end
+              end
+            end
+
+            measure('pusher') do
+              pusher_client.push(pusher_payload)
+            end
+          rescue => e
+            Travis.logger.error("Error notifying of test-results update: #{e.message} (from #{e.backtrace.first})")
+          end
+
+          def pusher_payload
+            job_id = payload['steps'].first['job_id']
+            {
+              "id" => job_id,
+              "data" => payload,
+            }
+          end
+
+          def channel_occupied?(channel_name)
+            existence.occupied?(channel_name)
+          end
+
+          def channel_name
+            pusher_client.pusher_channel_name(pusher_payload)
+          end
+
+          def existence_check_metrics?
+            TestResults.config.channels_existence_metrics
+          end
+
+          def existence_check?
+            TestResults.config.channels_existence_check
           end
 
       end

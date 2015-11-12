@@ -42,11 +42,11 @@ module Travis
               end
             end
             message.ack
-          rescue => e
-            log_exception(e, payload)
-            message.reject(requeue: true)
-            Metriks.meter("#{METRIKS_PREFIX}.receive.retry").mark
-            error "[queue:receive] message requeued"
+          #rescue => e
+          #  log_exception(e, payload)
+          #  message.reject(requeue: true)
+          #  Metriks.meter("#{METRIKS_PREFIX}.receive.retry").mark
+          #  error "[queue:receive] message requeued"
           end
 
           def smart_retry(&block)
