@@ -11,13 +11,9 @@ module Travis
         @config ||= Config.load
       end
 
-      def database_connection=(connection)
-        @database_connection = connection
-      end
+      attr_writer :database_connection
 
-      def database_connection
-        @database_connection
-      end
+      attr_reader :database_connection
     end
   end
 end

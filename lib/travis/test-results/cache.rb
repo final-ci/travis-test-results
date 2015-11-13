@@ -30,7 +30,7 @@ module Travis::TestResults
         rescue StandardError => e
           Travis.logger.error "Step Cache GC exploded: #{e.class}: #{e.message}"
           Travis.logger.error "GC backtrace: #{e.backtrace.join("\n")}"
-          #raise e
+          # raise e
         end
       end
     end
@@ -83,7 +83,7 @@ module Travis::TestResults
     end
 
     def exists?(job_id)
-      return !!@cache[job_id]
+      !!@cache[job_id]
     end
 
     def delete(job_id)

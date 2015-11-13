@@ -1,11 +1,13 @@
 language: ruby
+
+addons:
+    postgresql: "9.3"
+
 services:
   - redis
   - rabbitmq
   - postgresql
 
-env:
-  - JRUBY_OPTS="--dev -Xcext.enabled=false -Xcompile.invokedynamic=false"
 
 rvm:
   - ruby-2.2.2
@@ -15,11 +17,7 @@ cache: bundler
 
 before_script:
   - cp config/travis.example.yml config/travis.yml
-  - # psql -c "CREATE DATABASE test_results_test;" -U postgres
-  - # bundle exec rake db:migrate
+  - psql -c "CREATE DATABASE travis_test_results_test;" -U postgres
+  - bundle exec rake db:migrate
 
 script: bundle exec rspec spec
-
-matrix:
-  allow_failures:
-    - rvm: jruby-head

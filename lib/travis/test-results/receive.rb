@@ -1,4 +1,4 @@
-#$: << 'lib'
+# $: << 'lib'
 require 'travis/test-results'
 require 'travis/support'
 require 'travis/support/amqp'
@@ -23,7 +23,6 @@ module Travis
         db = Travis::TestResults::Helpers::Database.connect
         TestResults.database_connection = db
 
-
         declare_exchanges
       end
 
@@ -35,9 +34,7 @@ module Travis
       end
 
       def amqp_config
-        Travis::TestResults.config.amqp.merge({
-          :thread_pool_size => (TestResults.config.test_results.threads * 2 + 3)
-        })
+        Travis::TestResults.config.amqp.merge(thread_pool_size: (TestResults.config.test_results.threads * 2 + 3))
       end
 
       def declare_exchanges

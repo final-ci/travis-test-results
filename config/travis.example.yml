@@ -8,16 +8,12 @@ database_defaults: &database_defaults
 
 development:
   test_results:
-    gc_pooling_interval: 15
-    gc_remove_after: 86400
     threads: 3
-    pretty_json: true
-    results_path: '/var/lib/final-ci/test-results'
   test_results_database:
     <<: *database_defaults
-    database: travis_development
+    database: travis_test_results_development
 
 test:
   test_results_database:
     <<: *database_defaults
-    database: travis_test
+    database: travis_test_results_test

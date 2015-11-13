@@ -37,10 +37,10 @@ module Travis::TestResults
           { 'name' => 'channel_occupied', 'channel' => 'foo' },
           { 'name' => 'channel_vacated',  'channel' => 'bar' }
         ])
-        pusher.should_receive(:webhook) { |request|
-          request.path_info == '/pusher/existence'
+        pusher.should_receive(:webhook) do |request|
+          expect(request.path_info).to eq '/pusher/existence'
           webhook
-        }
+        end
 
         response = post '/pusher/existence'
         response.status.should == 204
@@ -50,12 +50,12 @@ module Travis::TestResults
 
         webhook = OpenStruct.new(valid?: true, events: [
           { 'name' => 'channel_vacated', 'channel' => 'foo' },
-          { 'name' => 'channel_occupied',  'channel' => 'bar' }
+          { 'name' => 'channel_occupied', 'channel' => 'bar' }
         ])
-        pusher.should_receive(:webhook) { |request|
-          request.path_info == '/pusher/existence'
+        pusher.should_receive(:webhook) do |request|
+          expect(request.path_info).to eq '/pusher/existence'
           webhook
-        }
+        end
 
         response = post '/pusher/existence'
         response.status.should == 204
@@ -66,10 +66,10 @@ module Travis::TestResults
 
       it 'responds with 401 with invalid webhook' do
         webhook = OpenStruct.new(valid?: false)
-        pusher.should_receive(:webhook) { |request|
-          request.path_info == '/pusher/existence'
+        pusher.should_receive(:webhook) do |request|
+          expect(request.path_info).to eq '/pusher/existence'
           webhook
-        }
+        end
 
         response = post '/pusher/existence'
         response.status.should == 401

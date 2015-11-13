@@ -4,7 +4,6 @@ require 'travis/support/amqp'
 require 'multi_json'
 require 'hashr'
 
-
 Travis::Amqp.config = {
   host: 'localhost',
   port: 5672,
@@ -14,7 +13,6 @@ Travis::Amqp.config = {
 }
 
 class QueueTester
-
   def start
     Travis::Amqp.connect
     @publisher = Travis::Amqp::Publisher.jobs(
@@ -33,16 +31,15 @@ class QueueTester
   def queue_job
     @publisher.publish(payload)
   end
-
 end
 
 def payload
   {
-    id: 1, #job_id
+    id: 1, # job_id
     name: "test step no. #{rand(10)} name",
     classname: "test case no. #{rand(10)} name",
     result: rand(2) == 0 ? 'success' : 'failure',
-      duration: rand(1000)
+    duration: rand(1000)
   }
 end
 
@@ -51,11 +48,11 @@ puts "about to start the queue tester\n\n"
 @queue_tester = QueueTester.new
 @queue_tester.start
 
-Signal.trap("INT")  { @queue_tester.stop; exit }
+Signal.trap('INT') { @queue_tester.stop; exit }
 
 puts "queue tester started! \n\n"
 
-while true do
+loop do
   print 'press enter to push test_result message, or exit to quit : '
 
   output = gets.chomp
