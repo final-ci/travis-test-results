@@ -24,7 +24,6 @@ gem 'pg'
 gem 'multi_json'
 
 gem 'sinatra', '~> 1.4'
-gem 'connection_pool'
 gem 'rack-ssl'
 gem 'unicorn'
 
