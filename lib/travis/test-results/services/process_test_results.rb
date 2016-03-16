@@ -90,7 +90,7 @@ module Travis
         end
 
         def pusher_payload
-          job_id = payload['steps'].first['job_id']
+          job_id = payload['job_id'] || payload['steps'].first['job_id']
           {
             'id' => job_id,
             'data' => payload
