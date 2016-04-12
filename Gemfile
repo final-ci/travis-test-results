@@ -25,7 +25,7 @@ gem 'multi_json'
 
 gem 'sinatra', '~> 1.4'
 gem 'rack-ssl'
-gem 'unicorn'
+gem 'puma'
 
 group :test do
   gem 'rspec', '~> 2.14.1'

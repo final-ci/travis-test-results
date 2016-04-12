@@ -37,7 +37,6 @@ GEM
     i18n (0.7.0)
     json (1.8.3)
     json (1.8.3-java)
-    kgio (2.9.3)
     metriks (0.9.9.7)
       atomic (~> 1.0)
       avl_tree (~> 1.2.0)
@@ -45,6 +44,7 @@ GEM
     multi_json (1.11.0)
     multipart-post (2.0.0)
     pg (0.18.1)
+    puma (3.1.0)
     pusher (0.14.6)
       httpclient (~> 2.5)
       multi_json (~> 1.0)
@@ -57,7 +57,6 @@ GEM
       rack
     rack-test (0.6.3)
       rack (>= 1.0)
-    raindrops (0.14.0)
     rake (10.4.2)
     redis (3.2.1)
     redis-namespace (1.5.2)
@@ -86,10 +85,6 @@ GEM
       hitimes
     travis-config (0.1.0)
       hashr (~> 0.0)
-    unicorn (4.9.0)
-      kgio (~> 2.6)
-      rack
-      raindrops (~> 0.7)
 
 PLATFORMS
   java
@@ -102,6 +97,7 @@ DEPENDENCIES
   metriks
   multi_json
   pg
+  puma
   pusher
   rack-ssl
   rack-test
@@ -113,7 +109,6 @@ DEPENDENCIES
   sinatra (~> 1.4)
   travis-config (~> 0.1.0)
   travis-support!
-  unicorn
 
 BUNDLED WITH
-   1.10.6
+   1.11.2
